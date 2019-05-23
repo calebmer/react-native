@@ -29,6 +29,7 @@
                          reactTag:(NSNumber *)reactTag
           scrollViewContentOffset:(CGPoint)scrollViewContentOffset
            scrollViewContentInset:(UIEdgeInsets)scrollViewContentInset
+   scrollViewAdjustedContentInset:(UIEdgeInsets)scrollViewAdjustedContentInset
             scrollViewContentSize:(CGSize)scrollViewContentSize
                   scrollViewFrame:(CGRect)scrollViewFrame
               scrollViewZoomScale:(CGFloat)scrollViewZoomScale
@@ -41,6 +42,7 @@
 {
   CGPoint _scrollViewContentOffset;
   UIEdgeInsets _scrollViewContentInset;
+  UIEdgeInsets _scrollViewAdjustedContentInset;
   CGSize _scrollViewContentSize;
   CGRect _scrollViewFrame;
   CGFloat _scrollViewZoomScale;
@@ -55,6 +57,7 @@
                          reactTag:(NSNumber *)reactTag
           scrollViewContentOffset:(CGPoint)scrollViewContentOffset
            scrollViewContentInset:(UIEdgeInsets)scrollViewContentInset
+   scrollViewAdjustedContentInset:(UIEdgeInsets)scrollViewAdjustedContentInset
             scrollViewContentSize:(CGSize)scrollViewContentSize
                   scrollViewFrame:(CGRect)scrollViewFrame
               scrollViewZoomScale:(CGFloat)scrollViewZoomScale
@@ -68,6 +71,7 @@
     _viewTag = reactTag;
     _scrollViewContentOffset = scrollViewContentOffset;
     _scrollViewContentInset = scrollViewContentInset;
+    _scrollViewAdjustedContentInset = scrollViewAdjustedContentInset;
     _scrollViewContentSize = scrollViewContentSize;
     _scrollViewFrame = scrollViewFrame;
     _scrollViewZoomScale = scrollViewZoomScale;
@@ -96,6 +100,12 @@ RCT_NOT_IMPLEMENTED(- (instancetype)init)
       @"left": @(_scrollViewContentInset.left),
       @"bottom": @(_scrollViewContentInset.bottom),
       @"right": @(_scrollViewContentInset.right)
+    },
+    @"adjustedContentInset": @{
+      @"top": @(_scrollViewAdjustedContentInset.top),
+      @"left": @(_scrollViewAdjustedContentInset.left),
+      @"bottom": @(_scrollViewAdjustedContentInset.bottom),
+      @"right": @(_scrollViewAdjustedContentInset.right)
     },
     @"contentSize": @{
       @"width": @(_scrollViewContentSize.width),
@@ -1149,10 +1159,17 @@ RCT_SET_AND_PRESERVE_OFFSET(setScrollIndicatorInsets, scrollIndicatorInsets, UIE
     _coalescingKey++;
     _lastEmittedEventName = [eventName copy];
   }
+  UIEdgeInsets adjustedContentInset;
+  if (@available(iOS 11.0, *)) {
+    adjustedContentInset = scrollView.adjustedContentInset;
+  } else {
+    adjustedContentInset = scrollView.contentInset;
+  }
   RCTScrollEvent *scrollEvent = [[RCTScrollEvent alloc] initWithEventName:eventName
                                                                  reactTag:self.reactTag
                                                   scrollViewContentOffset:scrollView.contentOffset
                                                    scrollViewContentInset:scrollView.contentInset
+                                           scrollViewAdjustedContentInset:adjustedContentInset
                                                     scrollViewContentSize:scrollView.contentSize
                                                           scrollViewFrame:scrollView.frame
                                                       scrollViewZoomScale:scrollView.zoomScale
@@ -1173,6 +1190,7 @@ RCT_SET_AND_PRESERVE_OFFSET(setScrollIndicatorInsets, scrollIndicatorInsets, UIE
                                                                      reactTag:reactTag
                                                       scrollViewContentOffset:CGPointZero
                                                        scrollViewContentInset:UIEdgeInsetsZero
+                                               scrollViewAdjustedContentInset:UIEdgeInsetsZero
                                                         scrollViewContentSize:CGSizeZero
                                                               scrollViewFrame:CGRectZero
                                                           scrollViewZoomScale:0
