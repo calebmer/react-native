@@ -17,41 +17,54 @@ import type {ExtendedError} from 'parseErrorStack';
  */
 let exceptionID = 0;
 function reportException(e: ExtendedError, isFatal: boolean) {
-  const {ExceptionsManager} = require('NativeModules');
-  if (ExceptionsManager) {
-    const parseErrorStack = require('parseErrorStack');
-    const stack = parseErrorStack(e);
-    const currentExceptionID = ++exceptionID;
-    const message =
-      e.jsEngine == null ? e.message : `${e.message}, js engine: ${e.jsEngine}`;
-    if (isFatal) {
-      ExceptionsManager.reportFatalException(
-        message,
-        stack,
-        currentExceptionID,
-      );
-    } else {
-      ExceptionsManager.reportSoftException(message, stack, currentExceptionID);
+  // Wait until the next turn of the event-loop so synchronously executing
+  // error boundaries have a chance to set `disableReactErrorOverlay`.
+  Promise.resolve().then(() => {
+    if (e.disableReactErrorOverlay) {
+      return;
     }
-    if (__DEV__) {
-      const symbolicateStackTrace = require('symbolicateStackTrace');
-      symbolicateStackTrace(stack)
-        .then(prettyStack => {
-          if (prettyStack) {
-            ExceptionsManager.updateExceptionMessage(
-              e.message,
-              prettyStack,
-              currentExceptionID,
-            );
-          } else {
-            throw new Error('The stack is null');
-          }
-        })
-        .catch(error =>
-          console.warn('Unable to symbolicate stack trace: ' + error.message),
+    const {ExceptionsManager} = require('NativeModules');
+    if (ExceptionsManager) {
+      const parseErrorStack = require('parseErrorStack');
+      const stack = parseErrorStack(e);
+      const currentExceptionID = ++exceptionID;
+      const message =
+        e.jsEngine == null
+          ? e.message
+          : `${e.message}, js engine: ${e.jsEngine}`;
+      if (isFatal) {
+        ExceptionsManager.reportFatalException(
+          message,
+          stack,
+          currentExceptionID,
         );
+      } else {
+        ExceptionsManager.reportSoftException(
+          message,
+          stack,
+          currentExceptionID,
+        );
+      }
+      if (__DEV__) {
+        const symbolicateStackTrace = require('symbolicateStackTrace');
+        symbolicateStackTrace(stack)
+          .then(prettyStack => {
+            if (prettyStack) {
+              ExceptionsManager.updateExceptionMessage(
+                e.message,
+                prettyStack,
+                currentExceptionID,
+              );
+            } else {
+              throw new Error('The stack is null');
+            }
+          })
+          .catch(error =>
+            console.warn('Unable to symbolicate stack trace: ' + error.message),
+          );
+      }
     }
-  }
+  });
 }
 
 declare var console: typeof console & {
