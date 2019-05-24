@@ -3115,6 +3115,14 @@ function renderWithHooks(
   renderExpirationTime = nextRenderExpirationTime;
   currentlyRenderingFiber$1 = workInProgress;
   nextCurrentHook = null !== current ? current.memoizedState : null;
+  currentHook = null;
+  workInProgressHook = null;
+  remainingExpirationTime = NoWork;
+  componentUpdateQueue = null;
+  didScheduleRenderPhaseUpdate = false;
+  renderPhaseUpdates = null;
+  numberOfReRenders = 0;
+  sideEffectTag = 0;
   ReactCurrentDispatcher$1.current =
     null === nextCurrentHook ? HooksDispatcherOnMount : HooksDispatcherOnUpdate;
   workInProgress = Component(props, refOrContext);

@@ -9452,16 +9452,16 @@ function renderWithHooks(
     current !== null ? current.memoizedState : null;
 
   // The following should have already been reset
-  // currentHook = null;
-  // workInProgressHook = null;
+  currentHook = null;
+  workInProgressHook = null;
 
-  // remainingExpirationTime = NoWork;
-  // componentUpdateQueue = null;
+  remainingExpirationTime = NoWork;
+  componentUpdateQueue = null;
 
-  // didScheduleRenderPhaseUpdate = false;
-  // renderPhaseUpdates = null;
-  // numberOfReRenders = 0;
-  // sideEffectTag = 0;
+  didScheduleRenderPhaseUpdate = false;
+  renderPhaseUpdates = null;
+  numberOfReRenders = 0;
+  sideEffectTag = 0;
 
   {
     ReactCurrentDispatcher$1.current =
