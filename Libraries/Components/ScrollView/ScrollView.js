@@ -249,6 +249,15 @@ type IOSProps = $ReadOnly<{|
    */
   snapToAlignment?: ?('start' | 'center' | 'end'),
   /**
+   * Pins the currently scrolled window to either the top of its content or
+   * the bottom. The default behavior is "top". That means when the content in
+   * the scroll view changes we will keep the offset of the scroll view from
+   * the top of the content the same. If we set this prop to "bottom" then
+   * when the content of the scroll view changes we will keep the offset from
+   * the bottom of the content the same.
+   */
+  pinToButton?: ?('top' | 'bottom'),
+  /**
    * The current scale of the scroll view content. The default value is 1.0.
    * @platform ios
    */

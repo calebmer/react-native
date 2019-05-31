@@ -966,18 +966,27 @@ RCT_SCROLL_EVENT_HANDLER(scrollViewDidScrollToTop, onScrollToTop)
   CGSize oldContentSize = _scrollView.contentSize;
   CGSize viewportSize = [self _calculateViewportSize];
 
+  BOOL updatedOffsetY = false;
   BOOL fitsinViewportY = oldContentSize.height <= viewportSize.height && newContentSize.height <= viewportSize.height;
   if (newContentSize.height < oldContentSize.height && !fitsinViewportY) {
     CGFloat offsetHeight = oldOffset.y + viewportSize.height;
     if (oldOffset.y < 0) {
       // overscrolled on top, leave offset alone
+      updatedOffsetY = true;
     } else if (offsetHeight > oldContentSize.height) {
       // overscrolled on the bottom, preserve overscroll amount
       newOffset.y = MAX(0, oldOffset.y - (oldContentSize.height - newContentSize.height));
+      updatedOffsetY = true;
     } else if (offsetHeight > newContentSize.height) {
       // offset falls outside of bounds, scroll back to end of list
       newOffset.y = MAX(0, newContentSize.height - viewportSize.height);
+      updatedOffsetY = true;
     }
+  }
+
+  if (!updatedOffsetY && [self.pinWindowTo isEqualToString:@"bottom"]) {
+    CGFloat oldOffsetBottom = oldContentSize.height - (oldOffset.y + viewportSize.height);
+    newOffset.y = newContentSize.height - viewportSize.height - oldOffsetBottom;
   }
 
   BOOL fitsinViewportX = oldContentSize.width <= viewportSize.width && newContentSize.width <= viewportSize.width;
