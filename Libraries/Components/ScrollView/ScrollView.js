@@ -256,7 +256,7 @@ type IOSProps = $ReadOnly<{|
    * when the content of the scroll view changes we will keep the offset from
    * the bottom of the content the same.
    */
-  pinToButton?: ?('top' | 'bottom'),
+  pinWindowTo?: ?('top' | 'bottom'),
   /**
    * The current scale of the scroll view content. The default value is 1.0.
    * @platform ios
